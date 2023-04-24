@@ -1,0 +1,64 @@
+--------------------------------------------------------
+--  DDL for Trigger EMPLOYEE_I
+--------------------------------------------------------
+CREATE OR REPLACE TRIGGER "HHMS"."EMPLOYEE_I" 
+AFTER INSERT ON EMPLOYEE 
+REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN
+    hhms.new_employee(:new.employee_id, :new.employee_category_id);
+END;
+/
+
+--------------------------------------------------------
+--  DDL for Trigger EMPLOYEE_STATUS_U
+--------------------------------------------------------
+CREATE OR REPLACE TRIGGER "HHMS"."EMPLOYEE_STATUS_U" 
+BEFORE UPDATE OF STATE ON EMPLOYEE 
+REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN
+    hhms.employee_state_change(:new.employee_id, :new.state, :new.employee_category_id);
+END;
+/
+
+--------------------------------------------------------
+--  DDL for Trigger ITEM_I
+--------------------------------------------------------
+CREATE OR REPLACE TRIGGER "HHMS"."ITEM_I" 
+AFTER INSERT ON ITEM 
+REFERENCING OLD AS OLD NEW AS NEW 
+FOR EACH ROW
+BEGIN
+    new_item(:new.item_id, :new.department_id);
+END;
+/
+
+--------------------------------------------------------
+--  DDL for Trigger ITEM_SATUS_U
+--------------------------------------------------------
+CREATE OR REPLACE TRIGGER "HHMS"."ITEM_SATUS_U" 
+AFTER UPDATE OF STATE ON ITEM 
+REFERENCING OLD AS OLD NEW AS NEW 
+FOR EACH ROW
+BEGIN
+    item_state_change(:new.item_id, :new.department_id, :new.state);
+END;
+/
+
+--------------------------------------------------------
+--  DDL for Trigger MANAGER_I
+--------------------------------------------------------
+CREATE OR REPLACE TRIGGER "HHMS"."MANAGER_I" 
+BEFORE INSERT ON MANAGER 
+REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN
+    IF (:NEW.EMPLOYEE_CATEGORY_ID = 2) THEN
+        INSERT INTO EMPLOYEE(employee_id, first_name, last_name, employee_category_id, state)
+        VALUES (employee_seq.nextval,:new.first_name, :new.last_name, :new.employee_category_id, 'H');
+    END IF;
+END;
+/
+
+

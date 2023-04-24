@@ -1,0 +1,31 @@
+--select * from user_scheduler_schedules
+--SELECT JOB_NAME, JOB_PRIORITY FROM user_SCHEDULER_JOBS;
+
+
+begin
+   DBMS_SCHEDULER.DROP_JOB('HHMS.DAILY_RESET_ROOM');
+   DBMS_SCHEDULER.DROP_SCHEDULE('HHMS.DAILY_2AM');
+end;
+/
+--Create a Schedule,
+BEGIN
+   --Para los procesos matutinos (1 vez al dia de Lunes a Viernes, a las 8am)
+   dbms_scheduler.create_schedule(SCHEDULE_NAME    => 'HHMS.DAILY_2AM',
+                                  START_DATE       => SYSDATE,
+                                  REPEAT_INTERVAL  => 'FREQ=DAILY; BYDAY=MON,TUE,WED,THU,FRI,SAT,SUN; BYHOUR=2;',
+                                  --END_DATE         => ?,
+                                  COMMENTS         => 'background task very early');
+END;
+/
+-- create a job
+BEGIN 
+   -- Connect both dbms_scheduler parts by creating the final job 
+   dbms_scheduler.create_job(job_name        => 'HHMS.DAILY_RESET_ROOM',
+                             job_action      => 'HHMS.RESET_ROOM', 
+                             job_type        => 'STORED_PROCEDURE',
+                             schedule_name   => 'HHMS.DAILY_2AM', 
+                             enabled         => TRUE, 
+                             --auto_drop       => false, 
+                             comments        => 'Clean employee room assignation and room status'); 
+END; 
+/

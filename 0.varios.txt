@@ -1,0 +1,11 @@
+-- encontrar proceso en puerto (power shell), despues se puede matar con el task manager
+ netstat -ona | findstr :8080
+
+--PDB
+select * from dba_tablespaces
+select * from v$datafile
+show con_id
+show con_name
+select * from CDB_TABLESPACES
+select * from CDB_PDBS
+SELECT SYS_CONTEXT('USERENV', 'CON_NAME') FROM dual;
